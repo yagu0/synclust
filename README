@@ -1,0 +1,16 @@
+Author : Benjamin Auder, Christophe Giraud
+Institution : Université Paris Sud (Orsay) / CNRS
+
+This package allow to find regions of synchronous variation for a given population species. 
+Two methods are available, either direct graph clustering or parameters estimations in a convex optimization problem.
+
+-------------------------------------------
+
+Main function to cluster populations data = findSyncVarRegions()
+
+To regenerate documentation, use R package roxygen2
+
+==================
+
+Acknowledgements :
+TODO

@@ -1,0 +1,83 @@
+\documentclass{article}
+\usepackage{a4wide}
+\usepackage{graphicx}
+\def\pen{\textrm{pen}}
+\def\L{\mathcal{L}}
+\title{\bf Detecting areas with synchronous temporal dynamics}
+\author{Christophe Giraud}
+
+\begin{document}
+\maketitle
+
+\noindent This document summarizes the algorithm used when function \textit{findSyncVarRegions()} is called with first argument method=``convex''. Reading first the article \emph{Delimiting synchronous populations from monitoring data} by Giraud et al. is recommanded, since we use here the same notations.
+
+\section{Model and estimation procedure}
+
+\subsection{Goal}
+
+We write $Z_{stk}$ for the $k$th observations, year $t$, site $s$ and $z_{st}=\sum_{k}Z_{stk}$.
+Our goal is to estimate regions $R$ such that
+\begin{equation}\label{model}
+Z_{stk}\sim \textrm{Poisson}(\exp(\theta_{s}+f(x_{s},t)))\quad\textrm{with } f(x,t)\approx \sum_{R}\rho_{R}(t){\bf 1}_{x\in R}.
+\end{equation}
+ In other words, we try to estimate $f$ with the a priori that
+\begin{itemize}
+\item for each year $t$ the map $x \to f(x,t)$ is piecewise constant
+\item the boundary of the regions where $x \to f(x,t)$ is constant are the same for all year $t$.
+\end{itemize}
+The main difficulty is to detect the regions $R$.
+
+\subsection{Estimation procedure}
+Let $G$ be a graph and write $V(s)$ for the set of the neighbors of $s$ in G.
+The estimators $\widehat \theta$ and $\widehat f$ are defined as minimizers of 
+$$\mathcal{L}(\theta,f)+\alpha \pen(f):=\sum_{s,t}[e^{\theta_{s}+f_{st}}-z_{st}(\theta_{s}+f_{st})]+\alpha
+\sum_{s\stackrel{G}{\sim}u}\|f_{s.}-f_{u.}\|/D_{su}$$
+with boundary conditions: $f_{s1}=0$ for all $s$. We typically choose $D_{su}=1/|V(s)|+1/|V(u)|$.
+ 
+\section{Optimization algorithm}
+
+The following quantity is to be minimized
+$$\mathcal{L}(\theta,f)+\alpha \pen(f):=\sum_{s,t}[e^{\theta_{s}+f_{st}}-z_{st}(\theta_{s}+f_{st})]+\alpha\sum_{s\stackrel{G}{\sim}u}\|f_{s.}-f_{u.}\|/D_{su}$$
+with boundary conditions: $f_{s1}=0$ for all $s$.
+This last expression can be rewritten into
+$$\mathcal{L}(\theta,f)+\alpha \pen(f)=\sum_{s,t}[e^{\theta_{s}+f_{st}}-z_{st}(\theta_{s}+f_{st})]+\alpha
+\sum_{s\stackrel{G}{\sim}u}\max_{\|\phi_{su}\|\leq 1}\langle\phi_{su},f_{s.}-f_{u.}\rangle/D_{su}$$
+with $\phi_{su}\in\mathbf R^T$.
+
+\newpage
+\noindent Let us introduce
+$$F(\theta,f,\phi)=\sum_{s,t}[e^{\theta_{s}+f_{st}}-z_{st}(\theta_{s}+f_{st})]+\alpha
+\sum_{s<u}{\bf 1}_{s\stackrel{G}{\sim}u}\ \langle\phi_{su},f_{s.}-f_{u.}\rangle/D_{su}.$$
+We can reformulate the quantity to be optimized using $F$ as follows.
+$$\mathcal{L}(\theta,f)+\alpha \pen(f)=\max_{\max_{s< u}\|\phi_{su}\|\leq 1}F(\theta,f,\phi).$$
+The penalized log-likelihood can now be minimized with the following steps.
+
+\subsection*{Application}
+
+Iterate until convergence:
+\begin{enumerate}
+\item gradient descent in $\theta$:\\* $\theta\leftarrow \theta - h \nabla_{\theta}F$
+\item gradient descent in $f$ with condition $f[\ ,1]=0$\\*
+$f[\ ,-1]\leftarrow f[\ ,-1]-h'\nabla_{f[\ ,-1]}F$ 
+\item gradient ascent in $\phi$\\*
+$\phi_{su}\leftarrow \phi_{su}+h''\nabla_{\phi_{su}}F$
+\item $\phi_{su}\leftarrow \phi_{su}/\max(1,\|\phi_{su}\|)$
+\end{enumerate}
+Return($\theta,f$)
+
+%\subsection*{Gradient en $\theta$:}
+%On a
+%$$\mathcal{L}(\theta,f)=\sum_{s}\left[e^{\theta_{s}}\sum_{t}e^{f_{st}}-\theta_{s}\sum_{t}z_{st}\right]+\ldots$$
+%Donc 
+%$$\partial_{\theta_{s}}F=e^{\theta_{s}}\sum_{t}e^{f_{st}}-\sum_{t}z_{st}$$
+%
+%
+%\subsection*{Gradient en $f$:} on note $\phi_{su}=-\phi_{us}$ pour $s>u$
+%$$\partial_{f_{st}}F=e^{\theta_{s}}e^{f_{st}}-z_{st}+\alpha\sum_{u\in V(s)}\phi_{su}/D_{su}$$
+%
+%
+%\subsection*{Gradient en $\lambda$:}
+%pour $s<u$ avec $s\sim u$
+%$$\nabla_{\phi_{su}}F=\alpha(f_{s.}-f_{u.})/D_{su}.$$
+
+\end{document}

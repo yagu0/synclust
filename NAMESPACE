@@ -1,0 +1,8 @@
+# Export all user-level R functions
+export (findSyncVarRegions, drawMapWithSites, 
+		drawNeighborhoodGraph, plotCurves, .Last.lib)
+
+# Import all packages listed as Imports or Depends
+#import (methods)
+
+useDynLib(synclust)
