@@ -2,7 +2,3 @@
 .RData
 *.o
 *.so
-*.dll
-
-/*.zip
-/SYNCLUST_init/*
