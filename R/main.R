@@ -1,43 +1,42 @@
-#example of "not too bad" parameters
-#~ k=10
-#~ alpha=0.1 
-#~ gmode=1 
-#~ K = 5 
-#~ dtype = "spath"
-#~ cmeth = "HC"
-#~ pcoef=??
-#~ h=??
-#~ eps=??
-#~ maxit=??
-
-#MAIN FUNCTION : direct clustering from a neighborhoods graph, or get regions
-#from (Poisson) distribution parameters optimization, using convex relaxation.
-findSyncVarRegions = function(
-	method, #global method: "direct" or "convex"
-	M, #matrix of observations in rows, the two last columns 
-	   #corresponding to geographic coordinates; 
-	   #set to NULL to use our initial dataset (625 rows / 9 years)
-	k, #number of neighbors
-	alpha, #weight parameter for intra-neighborhoods distance computations
-	       #0 = take only geographic coordinates into account
-	       #1 = take only observations over the years into account
-	       #in-between : several levels of compromise
-	       #-1 or any negative value : use a heuristic to choose alpha
-	gmode, #0 = reduced [mutual] kNN; 1 = augmented kNN; (symmetric)
-	       #2 = normal kNN; 3 = one NN in each quadrant; (NON-symmetric)
-		   #NOTE: gmode==3 automatically sets k==4 (at most!)
-	K, #number of clusters
-	dtype, #distance type, in {"simple","spath","ectd"}.
-	       #NOTE: better avoid "simple" if gmode>=2
-	cmeth, #clustering method, in {"KM","HC","spec"} for k-means (distances based) 
-	       #or hierarchical clustering, or spectral clustering (only if gmode>=2)
-	pcoef=1.0, #penalty value for convex optimization
-	h=1e-3, #step in the min LL algorithm
-	eps=1e-3, #threshold to stop min.LL iterations
-	maxit=1e3, #maximum number of iterations in the min LL algo
-	showLL=TRUE, #print trace of log-likelihood evolution
-	disp=TRUE #true for interactive display (otherwise nothing gets plotted)
-) {
+#' Direct clustering from a neighborhoods graph, or get regions from (Poisson) 
+#' distribution parameters optimization, using convex relaxation.
+#'
+#' @param method Global method: "direct" or "convex"
+#' @param M Matrix of observations in rows, the two last columns 
+#'        corresponding to geographic coordinates; 
+#'        set to NULL to use our initial dataset (625 rows / 9 years)
+#' @param k Number of neighbors
+#' @param alpha Weight parameter for intra-neighborhoods distance computations; 
+#'        0 = take only geographic coordinates into account; 
+#'        1 = take only observations over the years into account; 
+#'        in-between : several levels of compromise; 
+#'        -1 or any negative value : use a heuristic to choose alpha.
+#' @param gmode Neighborhood type. 0 = reduced [mutual] kNN; 1 = augmented kNN (symmetric); 
+#'        2 = normal kNN; 3 = one NN in each quadrant; (NON-symmetric). 
+#'        NOTE: gmode==3 automatically sets k==4 (at most!)
+#' @param K Number of clusters
+#' @param dtype Distance type, in {"simple","spath","ectd"}. 
+#'        NOTE: better avoid "simple" if gmode>=2
+#' @param cmeth Clustering method, in {"KM","HC","spec"} for k-means (distances based) 
+#'        or hierarchical clustering, or spectral clustering (only if gmode>=2)
+#' @param pcoef Penalty value for convex optimization [default: 1.0]
+#' @param h Step in the min LL algorithm [default: 1e-3]
+#' @param eps Threshold to stop min.LL iterations [default: 1e-3]
+#' @param maxit Maximum number of iterations in the min LL algo [default: 1e3]
+#' @param showLL Print trace of log-likelihood evolution [default: true]
+#' @param disp True [default] for interactive display (otherwise nothing gets plotted)
+#' @return list with the following entries. M: data matrix in input; NI: computed neighborhoods; 
+#'         dists: computed distances matrix; clusts: partition into K clusters, as an integer vector; 
+#'         cxpar: parameters obtained after convex optimization (if applicable)
+#' @export
+#' @examples
+#' cvr = findSyncVarRegions("convex",M=NULL,k=10,alpha=0.1,gmode=1,K=5,dtype="spath",cmeth="HC")
+#' drawMapWithSitez(cvr$M, cvr$clusters)
+#' drawNeighboroodGraph(cvr$M, cvr$NI)
+#'
+findSyncVarRegions = function(method, M, k, alpha, gmode, K, dtype, cmeth,
+	pcoef=1.0, h=1e-3, eps=1e-3, maxit=1e3, showLL=TRUE, disp=TRUE)
+{
 	#get matrix M if not directly provided
 	if (is.null(M))
 	{

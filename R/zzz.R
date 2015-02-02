@@ -1,5 +1,5 @@
 #called when package is detached ( detach("package:pkg_name") )
-.Last.lib = function(path)
+.onDetach = function(libpath)
 {
-	library.dynam.unload("synclust", path)
+	library.dynam.unload("synclust", libpath)
 }

@@ -5,11 +5,14 @@ Date: 2013-01-31
 Title: Delimiting synchronous population areas
 Author: Benjamin Auder, Christophe Giraud
 Maintainer: Benjamin Auder <Benjamin.Auder@gmail.com>
-Depends: R (>= 2.14.1), mvtnorm
-Suggests: kernlab
+Depends:
+    R (>= 2.14.1),
+    mvtnorm
+Suggests:
+    kernlab
 Description: Provide two methods to cluster species by regions,
-        using temporal variations and/or geographic coordinates. 
-        The resulting areas (should) have synchronous variations.
+    using temporal variations and/or geographic coordinates.
+    The resulting areas (should) have synchronous variations.
 License: GPL (>= 3)
 LazyData: yes
 LazyLoad: yes

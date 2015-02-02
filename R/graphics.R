@@ -1,4 +1,9 @@
-#draw (France or...) map with all sites of colors 'cols'
+#' Draw (France or...) map with all sites of colors 'cols'
+#'
+#' @param M Coordinates matrix (in columns)
+#' @param cols Vector of colors for each row of M [default: all black]
+#' @export
+#'
 drawMapWithSites = function(M, cols=rep(1,nrow(M)))
 {
 	xMin = range(M[,1])[1]
@@ -17,7 +22,12 @@ drawMapWithSites = function(M, cols=rep(1,nrow(M)))
 	}
 }
 
-#draw neighborhoods graph on top of a country map (or any other map)
+#' Draw neighborhoods graph on top of a country map (or any other map)
+#'
+#' @param M Coordinates matrix (in columns)
+#' @param NI Neighborhoods of M rows (list of integer vectors)
+#' @export
+#'
 drawNeighborhoodGraph = function(M, NI)
 {
 	for (i in 1:length(NI))
@@ -27,7 +37,12 @@ drawNeighborhoodGraph = function(M, NI)
 	}
 }
 
-#plot a matrix of curves (in rows)
+#' Plot a matrix of curves (in rows)
+#'
+#' @param M Coordinates matrix (in columns)
+#' @param cols Vector of colors for each row of M [default: all black]
+#' @export
+#'
 plotCurves = function(M, cols=rep(1,nrow(M)))
 {
 	n = nrow(M)
